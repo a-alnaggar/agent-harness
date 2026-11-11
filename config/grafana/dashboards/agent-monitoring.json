@@ -1,0 +1,734 @@
+{
+  "id": null,
+  "uid": "agent-monitoring",
+  "title": "Agent Harness Monitoring",
+  "tags": [
+    "agent",
+    "monitoring"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "refresh": "5s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Completed runs / second",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(agent_runs_completed_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "runs/s",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Active runs",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(agent_runs_active{job=\"agent\"})",
+          "legendFormat": "active",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "p95 component latency",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(agent_run_duration_seconds_bucket{job=\"agent\"}[$__rate_interval])))",
+          "legendFormat": "agent",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(agent_llm_duration_seconds_bucket{job=\"agent\"}[$__rate_interval])))",
+          "legendFormat": "LLM",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(agent_tool_duration_seconds_bucket{job=\"agent\",origin!=\"subagent\"}[$__rate_interval])))",
+          "legendFormat": "tools",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "D",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(agent_memory_duration_seconds_bucket{job=\"agent\"}[$__rate_interval])))",
+          "legendFormat": "memory",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Mean component latency",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(agent_run_duration_seconds_sum{job=\"agent\"}[$__rate_interval])) / sum(rate(agent_run_duration_seconds_count{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "agent",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(agent_llm_duration_seconds_sum{job=\"agent\"}[$__rate_interval])) / sum(rate(agent_llm_duration_seconds_count{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "LLM",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "sum(rate(agent_tool_duration_seconds_sum{job=\"agent\",origin!=\"subagent\"}[$__rate_interval])) / sum(rate(agent_tool_duration_seconds_count{job=\"agent\",origin!=\"subagent\"}[$__rate_interval]))",
+          "legendFormat": "tools",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "D",
+          "expr": "sum(rate(agent_memory_duration_seconds_sum{job=\"agent\"}[$__rate_interval])) / sum(rate(agent_memory_duration_seconds_count{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "memory",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Component success / failure rates",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(outcome)(rate(agent_runs_completed_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "agent {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by(outcome)(rate(agent_llm_calls_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "LLM {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "C",
+          "expr": "sum by(outcome)(rate(agent_tool_calls_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "tools {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        },
+        {
+          "refId": "D",
+          "expr": "sum by(outcome)(rate(agent_memory_operations_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "memory {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Agent failure fraction",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "description": "No data before an observed failure series or completed runs; no fabricated zeroes.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(agent_runs_completed_total{job=\"agent\",outcome=\"failure\"}[$__rate_interval])) / sum(rate(agent_runs_completed_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "failure fraction",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "LLM tokens / second",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(direction)(rate(agent_llm_tokens_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "{{direction}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "LLM tokens in selected range",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(direction)(increase(agent_llm_tokens_total{job=\"agent\"}[$__range]))",
+          "legendFormat": "{{direction}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Built-in / MCP tool calls",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(tool,origin,outcome)(rate(agent_tool_calls_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "{{origin}} / {{tool}} / {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "p95 tool latency",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le,tool,origin)(rate(agent_tool_duration_seconds_bucket{job=\"agent\"}[$__rate_interval])))",
+          "legendFormat": "{{origin}} / {{tool}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Memory read / save / forget",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(operation,outcome)(rate(agent_memory_operations_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "{{operation}} / {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "p95 memory latency",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le,operation)(rate(agent_memory_duration_seconds_bucket{job=\"agent\"}[$__rate_interval])))",
+          "legendFormat": "{{operation}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Structured log drops",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 48,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(reason)(increase(agent_monitoring_log_dropped_total{job=\"agent\"}[$__range]))",
+          "legendFormat": "{{reason}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Agent scrape availability",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 48,
+        "w": 12,
+        "h": 8
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=\"agent\"}",
+          "legendFormat": "agent up",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Permission requests by decision / outcome",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 64,
+        "w": 12,
+        "h": 8
+      },
+      "description": "User confirmation decisions for CONFIRM and STRICT tools. Denied calls do not execute tools.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(decision,outcome)(rate(agent_permission_requests_total{job=\"agent\"}[$__rate_interval]))",
+          "legendFormat": "{{decision}} / {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "title": "p95 permission request duration",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 64,
+        "w": 12,
+        "h": 8
+      },
+      "description": "Time spent obtaining a permission decision, grouped by decision and outcome.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le,decision,outcome)(rate(agent_permission_duration_seconds_bucket{job=\"agent\"}[$__rate_interval])))",
+          "legendFormat": "{{decision}} / {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "title": "Sub-agent runs by agent / outcome",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 56,
+        "w": 12,
+        "h": 8
+      },
+      "description": "Completed sub-agent runs (course_knowledge, pdf_analyst, memory_manager, ...), excluding the parent run.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(agent_id,outcome)(rate(agent_runs_completed_total{job=\"agent\", agent_id!=\"parent\"}[$__rate_interval]))",
+          "legendFormat": "{{agent_id}} / {{outcome}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "title": "p95 sub-agent run duration",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 56,
+        "w": 12,
+        "h": 8
+      },
+      "description": "Time for each sub-agent type's own ReactLoop.run to finish, from delegate_task to returning its result to the parent.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le,agent_id)(rate(agent_run_duration_seconds_bucket{job=\"agent\", agent_id!=\"parent\"}[$__rate_interval])))",
+          "legendFormat": "{{agent_id}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "agent-prometheus"
+          }
+        }
+      ]
+    }
+  ]
+}

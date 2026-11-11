@@ -1,0 +1,186 @@
+rule_files: []
+evaluation_interval: 1m
+tests:
+- name: all-dashboard-expressions-parse-with-no-data
+  interval: 1m
+  promql_expr_test:
+  - expr: histogram_quantile(0.95, sum by(le)(rate(agent_llm_duration_seconds_bucket{job="agent"}[2m])))
+    eval_time: 4m
+    exp_samples: []
+  - expr: histogram_quantile(0.95, sum by(le)(rate(agent_memory_duration_seconds_bucket{job="agent"}[2m])))
+    eval_time: 4m
+    exp_samples: []
+  - expr: histogram_quantile(0.95, sum by(le)(rate(agent_run_duration_seconds_bucket{job="agent"}[2m])))
+    eval_time: 4m
+    exp_samples: []
+  - expr: histogram_quantile(0.95, sum by(le)(rate(agent_tool_duration_seconds_bucket{job="agent",origin!="subagent"}[2m])))
+    eval_time: 4m
+    exp_samples: []
+  - expr: histogram_quantile(0.95, sum by(le,operation)(rate(agent_memory_duration_seconds_bucket{job="agent"}[2m])))
+    eval_time: 4m
+    exp_samples: []
+  - expr: histogram_quantile(0.95, sum by(le,tool,origin)(rate(agent_tool_duration_seconds_bucket{job="agent"}[2m])))
+    eval_time: 4m
+    exp_samples: []
+  - expr: histogram_quantile(0.95, sum by(le,decision,outcome)(rate(agent_permission_duration_seconds_bucket{job="agent"}[2m])))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(direction)(increase(agent_llm_tokens_total{job="agent"}[4m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(direction)(rate(agent_llm_tokens_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(operation,outcome)(rate(agent_memory_operations_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(decision,outcome)(rate(agent_permission_requests_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(outcome)(rate(agent_llm_calls_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(outcome)(rate(agent_memory_operations_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(outcome)(rate(agent_runs_completed_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(outcome)(rate(agent_tool_calls_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(reason)(increase(agent_monitoring_log_dropped_total{job="agent"}[4m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(tool,origin,outcome)(rate(agent_tool_calls_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum(agent_runs_active{job="agent"})
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum(rate(agent_llm_duration_seconds_sum{job="agent"}[2m])) / sum(rate(agent_llm_duration_seconds_count{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum(rate(agent_memory_duration_seconds_sum{job="agent"}[2m])) / sum(rate(agent_memory_duration_seconds_count{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum(rate(agent_run_duration_seconds_sum{job="agent"}[2m])) / sum(rate(agent_run_duration_seconds_count{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum(rate(agent_runs_completed_total{job="agent",outcome="failure"}[2m]))
+      / sum(rate(agent_runs_completed_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum(rate(agent_runs_completed_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum(rate(agent_tool_duration_seconds_sum{job="agent",origin!="subagent"}[2m])) / sum(rate(agent_tool_duration_seconds_count{job="agent",origin!="subagent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: up{job="agent"}
+    eval_time: 4m
+    exp_samples: []
+  - expr: sum by(agent_id,outcome)(rate(agent_runs_completed_total{job="agent", agent_id!="parent"}[2m]))
+    eval_time: 4m
+    exp_samples: []
+  - expr: histogram_quantile(0.95, sum by(le,agent_id)(rate(agent_run_duration_seconds_bucket{job="agent", agent_id!="parent"}[2m])))
+    eval_time: 4m
+    exp_samples: []
+- name: fixed-counter-gauge-and-histogram-results
+  interval: 1m
+  input_series:
+  - series: agent_runs_completed_total{job="agent",outcome="success"}
+    values: 0+3x8
+  - series: agent_runs_completed_total{job="agent",outcome="failure"}
+    values: 0+1x8
+  - series: agent_runs_active{job="agent"}
+    values: 2 2 2 2 2
+  - series: agent_llm_tokens_total{job="agent",direction="input"}
+    values: 0+60x8
+  - series: agent_tool_calls_total{job="agent",tool="read_file",origin="builtin",outcome="success"}
+    values: 0+60x8
+  - series: agent_memory_operations_total{job="agent",operation="save",outcome="success"}
+    values: 0+60x8
+  - series: agent_run_duration_seconds_bucket{job="agent",le="0.1"}
+    values: 0 0 0 0 0
+  - series: agent_run_duration_seconds_bucket{job="agent",le="1"}
+    values: 0+60x8
+  - series: agent_run_duration_seconds_bucket{job="agent",le="+Inf"}
+    values: 0+60x8
+  - series: agent_llm_tokens_total{job="agent",direction="output"}
+    values: 0+120x8
+  - series: agent_tool_calls_total{job="agent",tool="search_emails",origin="mcp",outcome="success"}
+    values: 0+120x8
+  - series: agent_memory_operations_total{job="agent",operation="read",outcome="success"}
+    values: 0+60x8
+  - series: agent_memory_operations_total{job="agent",operation="forget",outcome="success"}
+    values: 0+60x8
+  promql_expr_test:
+  - expr: sum(rate(agent_runs_completed_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples:
+    - labels: '{}'
+      value: 0.06666666666666667
+  - expr: sum(agent_runs_active{job="agent"})
+    eval_time: 4m
+    exp_samples:
+    - labels: '{}'
+      value: 2
+  - expr: sum(rate(agent_runs_completed_total{job="agent",outcome="failure"}[2m]))
+      / sum(rate(agent_runs_completed_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples:
+    - labels: '{}'
+      value: 0.25
+  - expr: sum by(direction)(rate(agent_llm_tokens_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples:
+    - labels: '{direction="input"}'
+      value: 1
+    - labels: '{direction="output"}'
+      value: 2
+  - expr: sum by(tool,origin,outcome)(rate(agent_tool_calls_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples:
+    - labels: '{tool="read_file",origin="builtin",outcome="success"}'
+      value: 1
+    - labels: '{tool="search_emails",origin="mcp",outcome="success"}'
+      value: 2
+  - expr: sum by(operation,outcome)(rate(agent_memory_operations_total{job="agent"}[2m]))
+    eval_time: 4m
+    exp_samples:
+    - labels: '{operation="save",outcome="success"}'
+      value: 1
+    - labels: '{operation="read",outcome="success"}'
+      value: 1
+    - labels: '{operation="forget",outcome="success"}'
+      value: 1
+  - expr: histogram_quantile(0.95, sum by(le)(rate(agent_run_duration_seconds_bucket{job="agent"}[2m])))
+    eval_time: 4m
+    exp_samples:
+    - labels: '{}'
+      value: 0.955
+- name: sub-agent-runs-are-labeled-separately-from-the-parent
+  interval: 1m
+  input_series:
+  - series: agent_runs_completed_total{job="agent",outcome="success",agent_id="parent"}
+    values: 0+3x8
+  - series: agent_runs_completed_total{job="agent",outcome="success",agent_id="course_knowledge"}
+    values: 0+2x8
+  - series: agent_run_duration_seconds_bucket{job="agent",agent_id="course_knowledge",le="0.1"}
+    values: 0 0 0 0 0
+  - series: agent_run_duration_seconds_bucket{job="agent",agent_id="course_knowledge",le="1"}
+    values: 0+60x8
+  - series: agent_run_duration_seconds_bucket{job="agent",agent_id="course_knowledge",le="+Inf"}
+    values: 0+60x8
+  promql_expr_test:
+  - expr: sum by(agent_id,outcome)(rate(agent_runs_completed_total{job="agent", agent_id!="parent"}[2m]))
+    eval_time: 4m
+    exp_samples:
+    - labels: '{agent_id="course_knowledge",outcome="success"}'
+      value: 0.03333333333333333
+  - expr: histogram_quantile(0.95, sum by(le,agent_id)(rate(agent_run_duration_seconds_bucket{job="agent", agent_id!="parent"}[2m])))
+    eval_time: 4m
+    exp_samples:
+    - labels: '{agent_id="course_knowledge"}'
+      value: 0.955

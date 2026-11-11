@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test / tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+tmp*/
+review-temp*/
+
+
+# Secrets — never commit the access token
+.env
+.secrets/
+credentials.json
+sandbox_key*
+token.json
+*token*.json
+gmail_credentials*.json
+gmail_token*.json
+client_secret*.json
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Local agent memory & databases
+.agent_memory.json
+.agent_monitoring/
+.agent_memory/
+.course_index/
+*.db
+*.sqlite3
+
+# Local container-run state (generated config) and the mounted agent workspace
+.run/
+workspace/

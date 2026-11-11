@@ -1,0 +1,11 @@
+apiVersion: 1
+providers:
+  - name: agent-monitoring
+    orgId: 1
+    folder: Agent Harness
+    type: file
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
